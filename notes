@@ -25,4 +25,20 @@ for i in `seq 12 2 26`; do echo "i: $i"; ./bbuild/test_ntt_gpu $i 1 2>&1 | tee -
 MTYP=1; cmake . -D CMAKE_CUDA_ARCHITECTURES=86 -D MODULAR_REDUCTION_TYPE=$MTYP -B./bbuild/$MTYP && ( cd bbuild/$MTYP && make; )
 MTYP=1; (for i in `seq 12 2 26`; do for b in `seq 2 2 8`; do  echo -e "\nring: $i, batch: $b"; ./bbuild/$MTYP/test_ntt_gpu $i $b; done; done;) 2>&1 | tee -a logs/test-ntt-gpu-${MTYP}-`date +"%Y-%-m-%d_%H-%M"`.log #run expt for specf mod type
 
+#= misc.
+$ pkg-config --modversion gtest || { echo -e "\nlib GoogleTest isnt installed, install by: $ sudo apt-get install libgtest-dev"; }
+
 #=
+g++ gtest/example.cpp -lgtest -o bin/gtest/example.out
+nvcc -forward-unknown-to-host-compiler -DBARRETT_64   --generate-code=arch=compute_86,code=[compute_86,sm_86] -x cu -dc src/common.cu -o tmp/common.cu.o
+nvcc -forward-unknown-to-host-compiler -DBARRETT_64   --generate-code=arch=compute_86,code=[compute_86,sm_86] -x cu -dc src/nttparameters.cu -o tmp/nttparameters.cu.o
+nvcc -forward-unknown-to-host-compiler -DBARRETT_64   --generate-code=arch=compute_86,code=[compute_86,sm_86] -x cu -dc src/ntt_cpu.cu -o tmp/ntt_cpu.cu.o
+nvcc -forward-unknown-to-host-compiler -DBARRETT_64   --generate-code=arch=compute_86,code=[compute_86,sm_86] -x cu -dc src/ntt.cu -o tmp/ntt.cu.o
+nvcc -forward-unknown-to-host-compiler -DBARRETT_64   --generate-code=arch=compute_86,code=[compute_86,sm_86] -x cu -dc test/ntt_cpu_test.cu -o tmp/ntt_cpu_test.cu.o
+nvcc -forward-unknown-to-host-compiler -DBARRETT_64   --generate-code=arch=compute_86,code=[compute_86,sm_86] -x cu -dc test/ntt_gpu_test.cu -o tmp/ntt_gpu_test.cu.o
+nvcc -forward-unknown-to-host-compiler -DBARRETT_64   --generate-code=arch=compute_86,code=[compute_86,sm_86] -x cu -dc test/ntt_gpu_bench.cu -o tmp/ntt_gpu_bench.cu.o
+nvcc -forward-unknown-to-host-compiler -DBARRETT_64  -arch=sm_89 test/ntt_gpu_test.cu src/*.cu -I./src -o bin/ntt_gpu_test
+nvcc -forward-unknown-to-host-compiler -DBARRETT_64  -arch=sm_89 test/ntt_gpu_bench.cu src/*.cu -I./src -o bin/ntt_gpu_bench
+nvcc -forward-unknown-to-host-compiler -DBARRETT_64  -arch=sm_89 test/ntt_cpu_test.cu src/*.cu -I./src -o bin/ntt_cpu_test
+nvcc -forward-unknown-to-host-compiler -DBARRETT_64  -arch=sm_89 test/ntt_gpu_test.cu src/*.cu -I./src -o bin/test_ntt_gpu
+nvcc -forward-unknown-to-host-compiler -DBARRETT_64  -arch=sm_89 gtest/test.cu src/*.cu -I./src -lgtest -o bin/test_ntt_gpu_gtest
