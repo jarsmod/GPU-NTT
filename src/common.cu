@@ -1,4 +1,5 @@
 #include "common.cuh"
+#include <limits>
 
 void customAssert(bool condition, const std::string& errorMessage)
 {
