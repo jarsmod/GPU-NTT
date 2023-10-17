@@ -36,12 +36,13 @@ int main(int argc, char* argv[])
 
 #ifdef BARRETT_64
     ModularReductionType modular_reduction_type = ModularReductionType::BARRET;
+    std::cout << "[mod type] " << ModularReductionType::BARRET << " (barret)" << std::endl;
 #elif defined(GOLDILOCKS_64)
-    ModularReductionType modular_reduction_type =
-        ModularReductionType::GOLDILOCK;
+    ModularReductionType modular_reduction_type = ModularReductionType::GOLDILOCK;
+    std::cout << "[mod type] " << ModularReductionType::GOLDILOCK << " (goldilock)" << std::endl;
 #elif defined(PLANTARD_64)
-    ModularReductionType modular_reduction_type =
-        ModularReductionType::PLANTARD;
+    ModularReductionType modular_reduction_type = ModularReductionType::PLANTARD;
+    std::cout << "[mod type] " << ModularReductionType::PLANTARD << " (plantard)" << std::endl;
 #else
 #error "Please define reduction type."
 #endif

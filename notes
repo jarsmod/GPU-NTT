@@ -3,9 +3,11 @@ Mon Oct 16 10:40:00 AM +03 2023
 git push -u origin testing
 
 #- Testing
-- MODULAR_REDUCTION_TYPE=0 -> Barrett Reduction(64 bit)
-- MODULAR_REDUCTION_TYPE=1 -> Goldilocks Reduction(64 bit)
-- MODULAR_REDUCTION_TYPE=2 -> Plantard Reduction(64 bit)
+- MODULUS
+    - MODULAR_REDUCTION_TYPE=0 -> Barrett Reduction(64 bit)
+    - MODULAR_REDUCTION_TYPE=1 -> Goldilocks Reduction(64 bit)
+    - MODULAR_REDUCTION_TYPE=2 -> Plantard Reduction(64 bit)
+- DEFAULT_MODULUS
 
 #= build from root dir
 $ cmake . -D CMAKE_CUDA_ARCHITECTURES=86 -D MODULAR_REDUCTION_TYPE=1 -B./bbuild && ( cd bbuild && make; )
@@ -22,8 +24,9 @@ for i in `seq 12 2 26`; do echo "i: $i"; ./bbuild/test_ntt_gpu $i 1 2>&1 | tee -
 (for i in `seq 12 2 26`; do for b in `seq 2 2 8`; do  echo -e "\nring: $i, batch: $b"; ./bbuild/test_ntt_gpu $i $b; done; done;) 2>&1 | tee -a logs/test-ntt-gpu-`date +"%Y-%-m-%d_%H-%M"`.log
 
 #= build and execute for specified mod type and test over i rings, b batches
-MTYP=1; cmake . -D CMAKE_CUDA_ARCHITECTURES=86 -D MODULAR_REDUCTION_TYPE=$MTYP -B./bbuild/$MTYP && ( cd bbuild/$MTYP && make; )
-MTYP=1; (for i in `seq 12 2 26`; do for b in `seq 2 2 8`; do  echo -e "\nring: $i, batch: $b"; ./bbuild/$MTYP/test_ntt_gpu $i $b; done; done;) 2>&1 | tee -a logs/test-ntt-gpu-${MTYP}-`date +"%Y-%-m-%d_%H-%M"`.log #run expt for specf mod type
+$ MTYP=1; cmake . -D CMAKE_CUDA_ARCHITECTURES=86 -D MODULAR_REDUCTION_TYPE=$MTYP -B./bbuild/$MTYP && ( cd bbuild/$MTYP && make; )
+$ MTYP=1; (for i in `seq 12 2 26`; do for b in `seq 2 2 8`; do  echo -e "\nring: $i, batch: $b"; ./bbuild/$MTYP/test_ntt_gpu $i $b; done; done;) 2>&1 | tee -a logs/test-ntt-gpu-${MTYP}-`date +"%Y-%-m-%d_%H-%M"`.log #run expt for specf mod type
+$ MTYP=2; (for i in `seq 12 2 26`; do for b in `seq 2 2 8`; do  echo -e "\nring: $i, batch: $b"; /bin/time -f "\n[time] %E real, %U user, %S sys" ./bbuild/$MTYP/test_ntt_gpu $i $b; done; done;) 2>&1 | tee -a logs/test-ntt-gpu-${MTYP}-`date +"%Y-%-m-%d_%H-%M"`.log # with time logging
 
 #= misc.
 $ pkg-config --modversion gtest || { echo -e "\nlib GoogleTest isnt installed, install by: $ sudo apt-get install libgtest-dev"; }
@@ -42,3 +45,24 @@ nvcc -forward-unknown-to-host-compiler -DBARRETT_64  -arch=sm_89 test/ntt_gpu_be
 nvcc -forward-unknown-to-host-compiler -DBARRETT_64  -arch=sm_89 test/ntt_cpu_test.cu src/*.cu -I./src -o bin/ntt_cpu_test
 nvcc -forward-unknown-to-host-compiler -DBARRETT_64  -arch=sm_89 test/ntt_gpu_test.cu src/*.cu -I./src -o bin/test_ntt_gpu
 nvcc -forward-unknown-to-host-compiler -DBARRETT_64  -arch=sm_89 gtest/test.cu src/*.cu -I./src -lgtest -o bin/test_ntt_gpu_gtest
+./bin/build-and-test-mtyp.sh 0 # script to build and run
+
+
+#= code structure
+class NTTParameters
+    ReductionPolynomial poly_reduction;
+    ModularReductionType modular_reduction;
+
+
+NTTParameters parameters
+    NTT_CPU generator(parameters);
+    ntt_result[i] = generator.ntt(input1[i]);
+
+    //GPU
+    ntt_configuration cfg_ntt = {
+        .n_power = LOGN,
+        .ntt_type = FORWARD,
+        .reduction_poly = ReductionPolynomial::X_N_minus,
+        .zero_padding = false,
+        .stream = 0};
+    GPU_NTT(InOut_Datas, Forward_Omega_Table_Device, parameters.modulus, cfg_ntt, BATCH);    
