@@ -9,7 +9,7 @@
 #include <vector>
 
 #include "cuda_runtime.h"
-#include "device_launch_parameters.h"
+//#include "device_launch_parameters.h" //ajaveed commented: this file was non existent
 
 //#define BARRETT_64
 //#define GOLDILOCKS_64
@@ -18,7 +18,9 @@
 #ifndef MODULAR_ARITHMATIC_H
 #define MODULAR_ARITHMATIC_H
 
-typedef unsigned long long Data;
+//typedef unsigned long long Data;
+using Data = unsigned long long; //ajaveed refactored: typedef is old practice
+                                 //ajaveed todo: get rid of `unsigned long long' in favor of uint64_t #include <stdint.h>
 
 #if defined(BARRETT_64) || defined(GOLDILOCKS_64)
 typedef unsigned long long Root;
@@ -337,7 +339,7 @@ class BarrettOperations {
   public:
     // Modular Addition for 64 bit
     // result = (input1 + input2) % modulus
-    static __device__ Data add(Data& input1, Data& input2, Modulus& modulus) {
+    static __host__ __device__ Data add(Data& input1, Data& input2, Modulus& modulus) {
         Data sum = input1 + input2;
         sum = (sum >= modulus.value) ? (sum - modulus.value) : sum;
 

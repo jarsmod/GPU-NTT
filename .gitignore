@@ -35,3 +35,4 @@ bbuild/*
 alisahGPU-NTT.code-workspace
 docs/*
 *.orig
+.ackrc

@@ -87,3 +87,4 @@ NTTParameters parameters
         .stream = 0};
     GPU_NTT(InOut_Datas, Forward_Omega_Table_Device, parameters.modulus, cfg_ntt, BATCH);    
 
+cmake . -D CMAKE_CUDA_ARCHITECTURES=86 -D MODULAR_REDUCTION_TYPE=0 -B./bbuild && ( cd bbuild && make; ) && ./bbuild/testsuite
