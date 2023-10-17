@@ -47,6 +47,17 @@ nvcc -forward-unknown-to-host-compiler -DBARRETT_64  -arch=sm_89 test/ntt_gpu_te
 nvcc -forward-unknown-to-host-compiler -DBARRETT_64  -arch=sm_89 gtest/test.cu src/*.cu -I./src -lgtest -o bin/test_ntt_gpu_gtest
 ./bin/build-and-test-mtyp.sh 0 # script to build and run
 
+#= src/ structure
+common.cu -- ignore
+common.cuh -- ignore
+modular_arith.cuh -- check it, mod operations
+ntt_cpu.cu
+ntt_cpu.cuh
+ntt.cu
+ntt.cuh
+nttparameters.cu
+nttparameters.cuh
+
 
 #= code structure
 class NTTParameters
@@ -61,8 +72,9 @@ NTTParameters parameters
     //GPU
     ntt_configuration cfg_ntt = {
         .n_power = LOGN,
-        .ntt_type = FORWARD,
+        .ntt_type = FORWARD, // .ntt_type = INVERSE,
         .reduction_poly = ReductionPolynomial::X_N_minus,
         .zero_padding = false,
         .stream = 0};
     GPU_NTT(InOut_Datas, Forward_Omega_Table_Device, parameters.modulus, cfg_ntt, BATCH);    
+doxygen .doxycfg # generate docs

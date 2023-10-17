@@ -33,3 +33,4 @@
 logs/*.log
 bbuild/*
 alisahGPU-NTT.code-workspace
+docs/*
