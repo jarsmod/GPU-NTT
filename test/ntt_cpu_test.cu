@@ -11,17 +11,13 @@ int LOGN;
 int BATCH;
 int N;
 
-int main(int argc, char* argv[])
-{
+int main(int argc, char* argv[]) {
     CudaDevice();
 
-    if (argc == 0)
-    {
+    if (argc == 0) {
         LOGN = 12;
         BATCH = 1;
-    }
-    else
-    {
+    } else {
         LOGN = atoi(argv[1]);
         BATCH = atoi(argv[2]);
     }
@@ -59,10 +55,8 @@ int main(int argc, char* argv[])
     // Random data generation for polynomials
     vector<vector<Data>> input1(BATCH);
     vector<vector<Data>> input2(BATCH);
-    for (int j = 0; j < BATCH; j++)
-    {
-        for (int i = 0; i < parameters.n; i++)
-        {
+    for (int j = 0; j < BATCH; j++) {
+        for (int i = 0; i < parameters.n; i++) {
             input1[j].push_back(dis(gen));
             input2[j].push_back(dis(gen));
         }
@@ -70,8 +64,7 @@ int main(int argc, char* argv[])
 
     // Performing CPU NTT
     vector<vector<Data>> ntt_mult_result(BATCH);
-    for (int i = 0; i < BATCH; i++)
-    {
+    for (int i = 0; i < BATCH; i++) {
         vector<Data> ntt_input1 = generator.ntt(input1[i]);
         vector<Data> ntt_input2 = generator.ntt(input2[i]);
         vector<Data> output = generator.mult(ntt_input1, ntt_input2);
@@ -81,22 +74,19 @@ int main(int argc, char* argv[])
     // Comparing CPU NTT multiplication results and schoolbook multiplication
     // results
     bool check = true;
-    for (int i = 0; i < BATCH; i++)
-    {
+    for (int i = 0; i < BATCH; i++) {
         std::vector<Data> schoolbook_result = schoolbook_poly_multiplication(
-            input1[i], input2[i], parameters.modulus,
-            ReductionPolynomial::X_N_minus);
+                input1[i], input2[i], parameters.modulus,
+                ReductionPolynomial::X_N_minus);
 
         check = check_result(ntt_mult_result[i].data(),
                              schoolbook_result.data(), parameters.n);
-        if (!check)
-        {
+        if (!check) {
             cout << "(in " << i << ". Poly.)" << endl;
             break;
         }
 
-        if ((i == (BATCH - 1)) && check)
-        {
+        if ((i == (BATCH - 1)) && check) {
             cout << "All Correct." << endl;
         }
     }

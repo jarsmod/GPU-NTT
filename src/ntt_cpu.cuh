@@ -11,14 +11,13 @@ std::vector<Data> schoolbook_poly_multiplication(
     std::vector<Data> a, std::vector<Data> b, Modulus modulus,
     ReductionPolynomial reduction_poly);
 
-class NTT_CPU
-{
-   public:
+class NTT_CPU {
+  public:
     NTTParameters parameters;
 
     NTT_CPU(NTTParameters parameters_);
 
-   public:
+  public:
     std::vector<Data> mult(std::vector<Data> &input1,
                            std::vector<Data> &input2);
 

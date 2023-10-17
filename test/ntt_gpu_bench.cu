@@ -10,17 +10,13 @@ using namespace std;
 int LOGN;
 int BATCH;
 
-int main(int argc, char* argv[])
-{
+int main(int argc, char* argv[]) {
     CudaDevice();
 
-    if (argc < 3)
-    {
+    if (argc < 3) {
         LOGN = 12;
         BATCH = 1;
-    }
-    else
-    {
+    } else {
         LOGN = atoi(argv[1]);
         BATCH = atoi(argv[2]);
     }
@@ -33,14 +29,13 @@ int main(int argc, char* argv[])
     const int test_count = 100;
     const int bestof = 25;
     float time_measurements[test_count];
-    for (int loop = 0; loop < test_count; loop++)
-    {
+    for (int loop = 0; loop < test_count; loop++) {
         std::random_device rd;
         std::mt19937 gen(rd());
         unsigned long long minNumber = (unsigned long long)1 << 40;
         unsigned long long maxNumber = ((unsigned long long)1 << 40) - 1;
         std::uniform_int_distribution<unsigned long long> dis(minNumber,
-                                                              maxNumber);
+                maxNumber);
         unsigned long long number = dis(gen);
 
         std::uniform_int_distribution<unsigned long long> dis2(0, number);
@@ -49,10 +44,8 @@ int main(int argc, char* argv[])
 
         // Random data generation for polynomials
         vector<vector<Data>> input1(BATCH);
-        for (int j = 0; j < BATCH; j++)
-        {
-            for (int i = 0; i < N; i++)
-            {
+        for (int j = 0; j < BATCH; j++) {
+            for (int i = 0; i < N; i++) {
                 input1[j].push_back(dis2(gen));
             }
         }
@@ -60,8 +53,7 @@ int main(int argc, char* argv[])
         vector<Root_> forward_root_table;
         vector<Root_> inverse_root_table;
 #ifdef PLANTARD_64
-        for (int i = 0; i < ROOT_SIZE; i++)
-        {
+        for (int i = 0; i < ROOT_SIZE; i++) {
             __uint128_t forward = ((__uint128_t)(dis(gen)) << (__uint128_t)64) +
                                   ((__uint128_t)(dis(gen)));
             __uint128_t inverse = ((__uint128_t)(dis(gen)) << (__uint128_t)64) +
@@ -72,8 +64,7 @@ int main(int argc, char* argv[])
 
         Ninverse n_inv = {.x = dis(gen), .y = dis(gen)};
 #else
-        for (int i = 0; i < ROOT_SIZE; i++)
-        {
+        for (int i = 0; i < ROOT_SIZE; i++) {
             forward_root_table.push_back(dis2(gen));
             inverse_root_table.push_back(dis2(gen));
         }
@@ -86,8 +77,7 @@ int main(int argc, char* argv[])
 
         THROW_IF_CUDA_ERROR(cudaMalloc(&InOut_Datas, BATCH * N * sizeof(Data)));
 
-        for (int j = 0; j < BATCH; j++)
-        {
+        for (int j = 0; j < BATCH; j++) {
             THROW_IF_CUDA_ERROR(cudaMemcpy(InOut_Datas + (N * j),
                                            input1[j].data(), N * sizeof(Data),
                                            cudaMemcpyHostToDevice));
@@ -130,7 +120,8 @@ int main(int argc, char* argv[])
             .ntt_type = FORWARD,
             .reduction_poly = ReductionPolynomial::X_N_minus,
             .zero_padding = false,
-            .stream = 0};
+            .stream = 0
+        };
 
         ntt_configuration cfg_intt = {
             .n_power = LOGN,
@@ -138,7 +129,8 @@ int main(int argc, char* argv[])
             .reduction_poly = ReductionPolynomial::X_N_minus,
             .zero_padding = false,
             .mod_inverse = n_inv,
-            .stream = 0};
+            .stream = 0
+        };
 
         float time = 0;
         cudaEvent_t startx, stopx;

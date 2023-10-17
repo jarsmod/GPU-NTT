@@ -12,29 +12,25 @@
 
 int bitreverse(int index, int n_power);
 
-enum ReductionPolynomial
-{
+enum ReductionPolynomial {
     X_N_plus,
     X_N_minus
 };  // X_N_minus: X^n - 1, X_N_plus: X^n + 1
 
-enum ModularReductionType
-{
+enum ModularReductionType {
     BARRET,
     PLANTARD,
     GOLDILOCK
 };
 
 // For any prime(64-bit)
-struct NTTFactors
-{
+struct NTTFactors {
     Modulus modulus;
     Data omega;
     Data psi;
 
     // Constructor to initialize the NTTFactors
-    __host__ NTTFactors(Modulus q_, Data omega_, Data psi_)
-    {
+    __host__ NTTFactors(Modulus q_, Data omega_, Data psi_) {
         modulus = q_;
         omega = omega_;
         psi = psi_;
@@ -44,9 +40,8 @@ struct NTTFactors
     // TODO: add check mechanism here
 };
 
-class NTTParameters
-{
-   public:
+class NTTParameters {
+  public:
     int logn;
     Data n;
 
@@ -82,7 +77,7 @@ class NTTParameters
 
     NTTParameters();
 
-   private:
+  private:
     Modulus modulus_pool();
 
     Data omega_pool();
@@ -99,7 +94,7 @@ class NTTParameters
     __uint128_t R_pool();
 #endif
 
-   public:
+  public:
     std::vector<Root_> gpu_root_of_unity_table_generator(
         std::vector<Data> table);
 };

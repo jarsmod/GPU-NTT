@@ -2,6 +2,15 @@ Mon Oct 16 10:40:00 AM +03 2023
 
 git push -u origin testing
 
+#= format source
+$ astyle --style=google test/ntt_gpu_test.cu # format source
+$ find src/ gtest/ test/ -type f -exec astyle --style=google {} \; # format all source
+
+#= documentation
+$ doxygen .doxycfg # generate docs
+	- not of much use, actual source has no support for documentation generation.
+	- todo for later
+
 #- Testing
 - MODULUS
     - MODULAR_REDUCTION_TYPE=0 -> Barrett Reduction(64 bit)
@@ -77,4 +86,4 @@ NTTParameters parameters
         .zero_padding = false,
         .stream = 0};
     GPU_NTT(InOut_Datas, Forward_Omega_Table_Device, parameters.modulus, cfg_ntt, BATCH);    
-doxygen .doxycfg # generate docs
+

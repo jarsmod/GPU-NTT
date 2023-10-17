@@ -6,20 +6,17 @@
 #include <iostream>
 #include <string>
 
-class CudaException : public std::exception
-{
-   public:
+class CudaException : public std::exception {
+  public:
     CudaException(const std::string& file, int line, cudaError_t error)
-        : file_(file), line_(line), error_(error)
-    {
+        : file_(file), line_(line), error_(error) {
     }
 
-    const char* what() const noexcept override
-    {
+    const char* what() const noexcept override {
         return m_error_string.c_str();
     }
 
-   private:
+  private:
     std::string file_;
     int line_;
     cudaError_t error_;

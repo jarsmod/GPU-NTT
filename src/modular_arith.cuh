@@ -32,8 +32,7 @@ typedef ulonglong2 Ninverse;
 #error "Please define reduction type."
 #endif
 
-struct Modulus
-{
+struct Modulus {
     Data value;
 #if defined(BARRETT_64) || defined(PLANTARD_64)
     Data bit;
@@ -45,8 +44,7 @@ struct Modulus
 #endif
 
     // Constructor to initialize the Modulus
-    __host__ Modulus(Data q_)
-    {
+    __host__ Modulus(Data q_) {
         value = q_;
 #if defined(BARRETT_64) || defined(PLANTARD_64)
         bit = bit_generator();
@@ -57,8 +55,7 @@ struct Modulus
 #error "Please define reduction type."
 #endif
     }
-    __host__ Modulus()
-    {
+    __host__ Modulus() {
         value = 0;
 #if defined(BARRETT_64) || defined(PLANTARD_64)
         bit = 0;
@@ -70,17 +67,15 @@ struct Modulus
 #endif
     }
 
-   private:
+  private:
 #if defined(BARRETT_64) || defined(PLANTARD_64)
-    Data bit_generator()
-    {
+    Data bit_generator() {
         Data q_bit = log2(value) + 1;
 
         return q_bit;
     }
 
-    Data mu_generator()
-    {
+    Data mu_generator() {
         __uint128_t mu_ = (__uint128_t)(1) << ((2 * bit) + 1);
         mu_ = mu_ / value;
 
@@ -95,16 +90,14 @@ struct Modulus
 
 #if defined(BARRETT_64) || defined(PLANTARD_64)
 
-namespace barrett64_cpu
-{  // It does not work  modulus higher than 62 bit.
+namespace barrett64_cpu {
+// It does not work  modulus higher than 62 bit.
 
-class BarrettOperations
-{
-   public:
+class BarrettOperations {
+  public:
     // Modular Addition for 64 bit
     // result = (input1 + input2) % modulus
-    static __host__ Data add(Data& input1, Data& input2, Modulus& modulus)
-    {
+    static __host__ Data add(Data& input1, Data& input2, Modulus& modulus) {
         Data sum = input1 + input2;
         sum = (sum >= modulus.value) ? (sum - modulus.value) : sum;
 
@@ -113,8 +106,7 @@ class BarrettOperations
 
     // Modular Substraction for 64 bit
     // result = (input1 - input2) % modulus
-    static __host__ Data sub(Data& input1, Data& input2, Modulus& modulus)
-    {
+    static __host__ Data sub(Data& input1, Data& input2, Modulus& modulus) {
         Data dif = input1 + modulus.value;
         dif = dif - input2;
         dif = (dif >= modulus.value) ? (dif - modulus.value) : dif;
@@ -124,8 +116,7 @@ class BarrettOperations
 
     // Modular Multiplication for 64 bit
     // result = (input1 * input2) % modulus
-    static __host__ Data mult(Data& input1, Data& input2, Modulus& modulus)
-    {
+    static __host__ Data mult(Data& input1, Data& input2, Modulus& modulus) {
         __uint128_t mult = (__uint128_t)input1 * (__uint128_t)input2;
 
         __uint128_t r = mult >> (modulus.bit - 2);
@@ -136,8 +127,7 @@ class BarrettOperations
 
         Data result = uint64_t(mult & UINT64_MAX);
 
-        if (result >= modulus.value)
-        {
+        if (result >= modulus.value) {
             result -= modulus.value;
         }
 
@@ -146,20 +136,17 @@ class BarrettOperations
 
     // Modular Exponentiation for 64 bit
     // result = (base ^ exponent) % modulus
-    static __host__ Data exp(Data& base, Data& exponent, Modulus& modulus)
-    {
+    static __host__ Data exp(Data& base, Data& exponent, Modulus& modulus) {
         // with window method
         unsigned long long result = 1;
 
         int modulus_bit = log2(modulus.value) + 1;
-        for (int i = modulus_bit - 1; i > -1; i--)
-        {
+        for (int i = modulus_bit - 1; i > -1; i--) {
             result =
                 barrett64_cpu::BarrettOperations::mult(result, result, modulus);
-            if (((exponent >> i) & 1u))
-            {
+            if (((exponent >> i) & 1u)) {
                 result = barrett64_cpu::BarrettOperations::mult(result, base,
-                                                                modulus);
+                         modulus);
             }
         }
 
@@ -168,8 +155,7 @@ class BarrettOperations
 
     // Modular Modular Inverse for 64 bit
     // result = (input ^ (-1)) % modulus
-    static __host__ Data modinv(Data& input, Modulus& modulus)
-    {
+    static __host__ Data modinv(Data& input, Modulus& modulus) {
         Data index = modulus.value - 2;
         return barrett64_cpu::BarrettOperations::exp(input, index, modulus);
     }
@@ -179,16 +165,14 @@ class BarrettOperations
 
 #elif defined(GOLDILOCKS_64)
 
-namespace goldilocks64_cpu
-{  // It does not work  modulus higher than 62 bit.
+namespace goldilocks64_cpu {
+// It does not work  modulus higher than 62 bit.
 
-class GoldilocksOperations
-{
-   public:
+class GoldilocksOperations {
+  public:
     // Modular Addition for 64 bit
     // result = (input1 + input2) % modulus
-    static __host__ Data add(Data& input1, Data& input2, Modulus& modulus)
-    {
+    static __host__ Data add(Data& input1, Data& input2, Modulus& modulus) {
         __uint128_t sum = (__uint128_t)input1 + (__uint128_t)input2;
         sum = (sum >= modulus.value) ? (sum - modulus.value) : sum;
 
@@ -197,8 +181,7 @@ class GoldilocksOperations
 
     // Modular Substraction for 64 bit
     // result = (input1 - input2) % modulus
-    static __host__ Data sub(Data& input1, Data& input2, Modulus& modulus)
-    {
+    static __host__ Data sub(Data& input1, Data& input2, Modulus& modulus) {
         __uint128_t dif = (__uint128_t)input1 + (__uint128_t)modulus.value;
         dif = dif - input2;
         dif = (dif >= modulus.value) ? (dif - modulus.value) : dif;
@@ -208,8 +191,7 @@ class GoldilocksOperations
 
     // Modular Multiplication for 64 bit
     // result = (input1 * input2) % modulus
-    static __host__ Data mult(Data& input1, Data& input2, Modulus& modulus)
-    {
+    static __host__ Data mult(Data& input1, Data& input2, Modulus& modulus) {
         __uint128_t mult = (__uint128_t)input1 * (__uint128_t)input2;
 
         unsigned long long lo = uint64_t(mult & UINT64_MAX);
@@ -220,17 +202,13 @@ class GoldilocksOperations
         __uint128_t pre_result =
             (__uint128_t)(hiL * 4294967295) + (__uint128_t)lo;
 
-        if (pre_result < hiH)
-        {
+        if (pre_result < hiH) {
             pre_result = pre_result + modulus.value;
             pre_result = pre_result - hiH;
             return uint64_t(pre_result & UINT64_MAX);
-        }
-        else
-        {
+        } else {
             pre_result = pre_result - hiH;
-            if (pre_result >= modulus.value)
-            {
+            if (pre_result >= modulus.value) {
                 pre_result = pre_result - modulus.value;
             }
             return uint64_t(pre_result & UINT64_MAX);
@@ -239,20 +217,17 @@ class GoldilocksOperations
 
     // Modular Exponentiation for 64 bit
     // result = (base ^ exponent) % modulus
-    static __host__ Data exp(Data& base, Data& exponent, Modulus& modulus)
-    {
+    static __host__ Data exp(Data& base, Data& exponent, Modulus& modulus) {
         // with window method
         unsigned long long result = 1;
 
         int modulus_bit = log2(modulus.value) + 1;
-        for (int i = modulus_bit - 1; i > -1; i--)
-        {
+        for (int i = modulus_bit - 1; i > -1; i--) {
             result = goldilocks64_cpu::GoldilocksOperations::mult(result, result,
-                                                                modulus);
-            if (((exponent >> i) & 1u))
-            {
+                     modulus);
+            if (((exponent >> i) & 1u)) {
                 result = goldilocks64_cpu::GoldilocksOperations::mult(
-                    result, base, modulus);
+                             result, base, modulus);
             }
         }
 
@@ -261,8 +236,7 @@ class GoldilocksOperations
 
     // Modular Modular Inverse for 64 bit
     // result = (input ^ (-1)) % modulus
-    static __host__ Data modinv(Data& input, Modulus& modulus)
-    {
+    static __host__ Data modinv(Data& input, Modulus& modulus) {
         Data index = modulus.value - 2;
         return goldilocks64_cpu::GoldilocksOperations::exp(input, index, modulus);
     }
@@ -283,44 +257,36 @@ typedef goldilocks64_cpu::GoldilocksOperations VALUE;
 #endif
 
 #ifdef BARRETT_64
-namespace barrett64_gpu
-{
-class BarrettOperations
-{
-   private:
-    class uint128_t
-    {
-       public:
+namespace barrett64_gpu {
+class BarrettOperations {
+  private:
+    class uint128_t {
+      public:
         // x -> LSB side
         // y -> MSB side
         ulonglong2 value;
 
-        __device__ __forceinline__ uint128_t()
-        {
+        __device__ __forceinline__ uint128_t() {
             value.x = 0;
             value.y = 0;
         }
 
-        __device__ __forceinline__ uint128_t(const uint64_t& input)
-        {
+        __device__ __forceinline__ uint128_t(const uint64_t& input) {
             value.x = input;
             value.y = 0;
         }
 
-        __device__ __forceinline__ void operator=(const uint128_t& input)
-        {
+        __device__ __forceinline__ void operator=(const uint128_t& input) {
             value.x = input.value.x;
             value.y = input.value.y;
         }
 
-        __device__ __forceinline__ void operator=(const uint64_t& input)
-        {
+        __device__ __forceinline__ void operator=(const uint64_t& input) {
             value.x = input;
             value.y = 0;
         }
 
-        __device__ __forceinline__ uint128_t operator<<(const unsigned& shift)
-        {
+        __device__ __forceinline__ uint128_t operator<<(const unsigned& shift) {
             uint128_t result;
 
             result.value.y = value.y << shift;
@@ -330,8 +296,7 @@ class BarrettOperations
             return result;
         }
 
-        __device__ __forceinline__ uint128_t operator>>(const unsigned& shift)
-        {
+        __device__ __forceinline__ uint128_t operator>>(const unsigned& shift) {
             uint128_t result;
 
             result.value.x = value.x >> shift;
@@ -341,8 +306,7 @@ class BarrettOperations
             return result;
         }
 
-        __device__ __forceinline__ uint128_t operator-(uint128_t& other)
-        {
+        __device__ __forceinline__ uint128_t operator-(uint128_t& other) {
             uint128_t result;
 
             asm("{\n\t"
@@ -351,13 +315,12 @@ class BarrettOperations
                 "}"
                 : "=l"(result.value.y), "=l"(result.value.x)
                 : "l"(value.y), "l"(value.x), "l"(other.value.y),
-                  "l"(other.value.x));
+                "l"(other.value.x));
 
             return result;
         }
 
-        __device__ __forceinline__ uint128_t operator-=(const uint128_t& other)
-        {
+        __device__ __forceinline__ uint128_t operator-=(const uint128_t& other) {
             uint128_t result;
             asm("{\n\t"
                 "sub.cc.u64      %1, %3, %5;    \n\t"
@@ -365,17 +328,16 @@ class BarrettOperations
                 "}"
                 : "=l"(result.value.y), "=l"(result.value.x)
                 : "l"(value.y), "l"(value.x), "l"(other.value.y),
-                  "l"(other.value.x));
+                "l"(other.value.x));
 
             return result;
         }
     };
 
-   public:
+  public:
     // Modular Addition for 64 bit
     // result = (input1 + input2) % modulus
-    static __device__ Data add(Data& input1, Data& input2, Modulus& modulus)
-    {
+    static __device__ Data add(Data& input1, Data& input2, Modulus& modulus) {
         Data sum = input1 + input2;
         sum = (sum >= modulus.value) ? (sum - modulus.value) : sum;
 
@@ -384,8 +346,7 @@ class BarrettOperations
 
     // Modular Substraction for 64 bit
     // result = (input1 - input2) % modulus
-    static __device__ Data sub(Data& input1, Data& input2, Modulus& modulus)
-    {
+    static __device__ Data sub(Data& input1, Data& input2, Modulus& modulus) {
         Data dif = input1 + modulus.value;
         dif = dif - input2;
         dif = (dif >= modulus.value) ? (dif - modulus.value) : dif;
@@ -394,8 +355,7 @@ class BarrettOperations
     }
 
     static __device__ uint128_t mult128(const unsigned long long& a,
-                                        const unsigned long long& b)
-    {
+                                        const unsigned long long& b) {
         uint128_t result;
 
         asm("{\n\t"
@@ -411,8 +371,7 @@ class BarrettOperations
 
     // Modular Multiplication for 64 bit
     // result = (input1 * input2) % modulus
-    static __device__ Data mult(Data& input1, Data& input2, Modulus& modulus)
-    {
+    static __device__ Data mult(Data& input1, Data& input2, Modulus& modulus) {
         uint128_t z = mult128(input1, input2);
 
         uint128_t w = z >> (modulus.bit - 2);
@@ -426,50 +385,43 @@ class BarrettOperations
         z = z - w;
 
         return (z.value.x >= modulus.value) ? (z.value.x -= modulus.value)
-                                            : (z.value.x);
+               : (z.value.x);
     }
 };
 
 }  // namespace barrett64_gpu
 
-#elif defined(GOLDILOCKS_64)
+#elif defined(GOLDILOCKS_64) //ajaveed TODO: keep either preprocessor based inclusion or namespace wraps
 
-namespace goldilocks64_gpu
-{
-struct uint128_t
-{
-   public:
+namespace goldilocks64_gpu {
+struct uint128_t {
+  public:
     // x -> LSB side
     // y -> MSB side
     // ulonglong2 value;
     unsigned long long x, y;
 
-    __device__ __forceinline__ uint128_t()
-    {
+    __device__ __forceinline__ uint128_t() {
         x = 0;
         y = 0;
     }
 
-    __device__ __forceinline__ uint128_t(const uint64_t& input)
-    {
+    __device__ __forceinline__ uint128_t(const uint64_t& input) {
         x = input;
         y = 0;
     }
 
-    __device__ __forceinline__ void operator=(const uint128_t& input)
-    {
+    __device__ __forceinline__ void operator=(const uint128_t& input) {
         x = input.x;
         y = input.y;
     }
 
-    __device__ __forceinline__ void operator=(const uint64_t& input)
-    {
+    __device__ __forceinline__ void operator=(const uint64_t& input) {
         x = input;
         y = 0;
     }
 
-    __device__ __forceinline__ uint128_t operator<<(const unsigned& shift)
-    {
+    __device__ __forceinline__ uint128_t operator<<(const unsigned& shift) {
         uint128_t result;
 
         result.y = y << shift;
@@ -479,8 +431,7 @@ struct uint128_t
         return result;
     }
 
-    __device__ __forceinline__ uint128_t operator>>(const unsigned& shift)
-    {
+    __device__ __forceinline__ uint128_t operator>>(const unsigned& shift) {
         uint128_t result;
 
         result.x = x >> shift;
@@ -492,8 +443,7 @@ struct uint128_t
 };
 
 __device__ __forceinline__ uint128_t operator-(uint128_t& input1,
-                                               const uint128_t& input2)
-{
+        const uint128_t& input2) {
     uint128_t result;
 
     asm("{\n\t"
@@ -507,8 +457,7 @@ __device__ __forceinline__ uint128_t operator-(uint128_t& input1,
 }
 
 __device__ __forceinline__ uint128_t operator-(uint128_t& input1,
-                                               const Data& input2)
-{
+        const Data& input2) {
     uint128_t result;
 
     asm("{\n\t"
@@ -522,8 +471,7 @@ __device__ __forceinline__ uint128_t operator-(uint128_t& input1,
 }
 
 __device__ __forceinline__ void operator-=(uint128_t& input1,
-                                           const uint128_t& input2)
-{
+        const uint128_t& input2) {
     asm("{\n\t"
         "sub.cc.u64      %1, %3, %5;    \n\t"
         "subc.u64        %0, %2, %4;    \n\t"
@@ -533,8 +481,7 @@ __device__ __forceinline__ void operator-=(uint128_t& input1,
 }
 
 __device__ __forceinline__ void operator-=(uint128_t& input1,
-                                           const Data& input2)
-{
+        const Data& input2) {
     asm("{\n\t"
         "sub.cc.u64      %1, %3, %5;    \n\t"
         "subc.u64        %0, %2, %4;    \n\t"
@@ -544,8 +491,7 @@ __device__ __forceinline__ void operator-=(uint128_t& input1,
 }
 
 __device__ __forceinline__ uint128_t operator+(uint128_t& input1,
-                                               const uint128_t& input2)
-{
+        const uint128_t& input2) {
     uint128_t result;
 
     result.x = input1.x + input2.x;
@@ -555,8 +501,7 @@ __device__ __forceinline__ uint128_t operator+(uint128_t& input1,
 }
 
 __device__ __forceinline__ uint128_t operator+(uint128_t& input1,
-                                               const Data& input2)
-{
+        const Data& input2) {
     uint128_t result;
 
     result.x = input1.x + input2;
@@ -566,8 +511,7 @@ __device__ __forceinline__ uint128_t operator+(uint128_t& input1,
 }
 
 __device__ __forceinline__ bool operator>=(uint128_t& input1,
-                                           const uint128_t& input2)
-{
+        const uint128_t& input2) {
     if (input1.y > input2.y)
         return true;
     else if (input1.y < input2.y)
@@ -579,8 +523,7 @@ __device__ __forceinline__ bool operator>=(uint128_t& input1,
 }
 
 __device__ __forceinline__ bool operator>=(uint128_t& input1,
-                                           const Data& input2)
-{
+        const Data& input2) {
     if (input1.y > 0)
         return true;
     else if (input1.x >= input2)
@@ -589,14 +532,12 @@ __device__ __forceinline__ bool operator>=(uint128_t& input1,
         return false;
 }
 
-struct GoldilocksOperations
-{
-   public:
+struct GoldilocksOperations {
+  public:
     // Modular Addition for 64 bit
     // result = (input1 + input2) % modulus
     __device__ __forceinline__ static Data add(Data& input1, Data& input2,
-                                               Modulus& modulus)
-    {
+            Modulus& modulus) {
         // uint128_t sum = (uint128_t)input1 + input2;
         // sum = (sum >= modulus.value) ? (sum - modulus.value) : sum;
 
@@ -611,8 +552,7 @@ struct GoldilocksOperations
     // Modular Substraction for 64 bit
     // result = (input1 - input2) % modulus
     __device__ __forceinline__ static Data sub(Data& input1, Data& input2,
-                                               Modulus& modulus)
-    {
+            Modulus& modulus) {
         uint128_t dif = input1;
         dif = dif + modulus.value;
 
@@ -626,8 +566,7 @@ struct GoldilocksOperations
     // Modular Multiplication for 64 bit
     // result = (input1 * input2) % modulus
     __device__ __forceinline__ static Data mult(Data& input1, Data& input2,
-                                                Modulus& modulus)
-    {
+            Modulus& modulus) {
         // --------------------- //
         // Authors: Alisah Ozcan
         // --------------------- //
@@ -677,44 +616,36 @@ struct GoldilocksOperations
 
 #elif defined(PLANTARD_64)
 
-namespace plantard64_gpu
-{
-class PlantardOperations
-{
-   private:
-    class uint128_t
-    {
-       public:
+namespace plantard64_gpu {
+class PlantardOperations {
+  private:
+    class uint128_t {
+      public:
         // x -> LSB side
         // y -> MSB side
         ulonglong2 value;
 
-        __device__ __forceinline__ uint128_t()
-        {
+        __device__ __forceinline__ uint128_t() {
             value.x = 0;
             value.y = 0;
         }
 
-        __device__ __forceinline__ uint128_t(const uint64_t& input)
-        {
+        __device__ __forceinline__ uint128_t(const uint64_t& input) {
             value.x = input;
             value.y = 0;
         }
 
-        __device__ __forceinline__ void operator=(const uint128_t& input)
-        {
+        __device__ __forceinline__ void operator=(const uint128_t& input) {
             value.x = input.value.x;
             value.y = input.value.y;
         }
 
-        __device__ __forceinline__ void operator=(const uint64_t& input)
-        {
+        __device__ __forceinline__ void operator=(const uint64_t& input) {
             value.x = input;
             value.y = 0;
         }
 
-        __device__ __forceinline__ uint128_t operator<<(const unsigned& shift)
-        {
+        __device__ __forceinline__ uint128_t operator<<(const unsigned& shift) {
             uint128_t result;
 
             result.value.y = value.y << shift;
@@ -724,8 +655,7 @@ class PlantardOperations
             return result;
         }
 
-        __device__ __forceinline__ uint128_t operator>>(const unsigned& shift)
-        {
+        __device__ __forceinline__ uint128_t operator>>(const unsigned& shift) {
             uint128_t result;
 
             result.value.x = value.x >> shift;
@@ -735,8 +665,7 @@ class PlantardOperations
             return result;
         }
 
-        __device__ __forceinline__ uint128_t operator-(uint128_t& other)
-        {
+        __device__ __forceinline__ uint128_t operator-(uint128_t& other) {
             uint128_t result;
 
             asm("{\n\t"
@@ -745,13 +674,12 @@ class PlantardOperations
                 "}"
                 : "=l"(result.value.y), "=l"(result.value.x)
                 : "l"(value.y), "l"(value.x), "l"(other.value.y),
-                  "l"(other.value.x));
+                "l"(other.value.x));
 
             return result;
         }
 
-        __device__ __forceinline__ uint128_t operator-=(const uint128_t& other)
-        {
+        __device__ __forceinline__ uint128_t operator-=(const uint128_t& other) {
             uint128_t result;
             asm("{\n\t"
                 "sub.cc.u64      %1, %3, %5;    \n\t"
@@ -759,17 +687,16 @@ class PlantardOperations
                 "}"
                 : "=l"(result.value.y), "=l"(result.value.x)
                 : "l"(value.y), "l"(value.x), "l"(other.value.y),
-                  "l"(other.value.x));
+                "l"(other.value.x));
 
             return result;
         }
     };
 
-   public:
+  public:
     // Modular Addition for 64 bit
     // result = (input1 + input2) % modulus
-    static __device__ Data add(Data& input1, Data& input2, Modulus& modulus)
-    {
+    static __device__ Data add(Data& input1, Data& input2, Modulus& modulus) {
         Data sum = input1 + input2;
         sum = (sum >= modulus.value) ? (sum - modulus.value) : sum;
 
@@ -778,8 +705,7 @@ class PlantardOperations
 
     // Modular Substraction for 64 bit
     // result = (input1 - input2) % modulus
-    static __device__ Data sub(Data& input1, Data& input2, Modulus& modulus)
-    {
+    static __device__ Data sub(Data& input1, Data& input2, Modulus& modulus) {
         Data dif = input1 + modulus.value;
         dif = dif - input2;
         dif = (dif >= modulus.value) ? (dif - modulus.value) : dif;
@@ -790,8 +716,7 @@ class PlantardOperations
     // Modular Multiplication for 64 bit
     // result = (input1 * input2) % modulus
     static __device__ Data mult(Data& input1, ulonglong2& input2,
-                                Modulus& modulus)
-    {
+                                Modulus& modulus) {
         // --------------------- //
         // Authors: Alisah Ozcan
         // --------------------- //

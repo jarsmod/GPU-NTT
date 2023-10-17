@@ -10,11 +10,10 @@ using namespace std;
 int LOGN;
 int BATCH;
 
-int main(int argc, char* argv[])
-{
+int main(int argc, char* argv[]) {
     CudaDevice();
 
-        int device = 0; // Assuming you are using device 0
+    int device = 0; // Assuming you are using device 0
     cudaSetDevice(device);
 
     cudaDeviceProp prop;
@@ -23,13 +22,10 @@ int main(int argc, char* argv[])
     std::cout << "Maximum Grid Size: " << prop.maxGridSize[0] << " x " << prop.maxGridSize[1] << " x " << prop.maxGridSize[2] << std::endl;
 
 
-    if (argc < 3)
-    {
+    if (argc < 3) {
         LOGN = 12;
         BATCH = 1;
-    }
-    else
-    {
+    } else {
         LOGN = atoi(argv[1]);
         BATCH = atoi(argv[2]);
     }
@@ -68,18 +64,15 @@ int main(int argc, char* argv[])
 
     // Random data generation for polynomials
     vector<vector<Data>> input1(BATCH);
-    for (int j = 0; j < BATCH; j++)
-    {
-        for (int i = 0; i < parameters.n; i++)
-        {
+    for (int j = 0; j < BATCH; j++) {
+        for (int i = 0; i < parameters.n; i++) {
             input1[j].push_back(dis(gen));
         }
     }
 
     // Performing CPU NTT
     vector<vector<Data>> ntt_result(BATCH);
-    for (int i = 0; i < BATCH; i++)
-    {
+    for (int i = 0; i < BATCH; i++) {
         ntt_result[i] = generator.ntt(input1[i]);
     }
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -89,8 +82,7 @@ int main(int argc, char* argv[])
     THROW_IF_CUDA_ERROR(
         cudaMalloc(&InOut_Datas, BATCH * parameters.n * sizeof(Data)));
 
-    for (int j = 0; j < BATCH; j++)
-    {
+    for (int j = 0; j < BATCH; j++) {
         THROW_IF_CUDA_ERROR(
             cudaMemcpy(InOut_Datas + (parameters.n * j), input1[j].data(),
                        parameters.n * sizeof(Data), cudaMemcpyHostToDevice));
@@ -109,8 +101,8 @@ int main(int argc, char* argv[])
             parameters.forward_root_of_unity_table);
 
     THROW_IF_CUDA_ERROR(cudaMemcpy(
-        Forward_Omega_Table_Device, forward_omega_table.data(),
-        parameters.root_of_unity_size * sizeof(Root), cudaMemcpyHostToDevice));
+                            Forward_Omega_Table_Device, forward_omega_table.data(),
+                            parameters.root_of_unity_size * sizeof(Root), cudaMemcpyHostToDevice));
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -124,8 +116,8 @@ int main(int argc, char* argv[])
         parameters.gpu_root_of_unity_table_generator(
             parameters.inverse_root_of_unity_table);
     THROW_IF_CUDA_ERROR(cudaMemcpy(
-        Inverse_Omega_Table_Device, inverse_omega_table.data(),
-        parameters.root_of_unity_size * sizeof(Root), cudaMemcpyHostToDevice));
+                            Inverse_Omega_Table_Device, inverse_omega_table.data(),
+                            parameters.root_of_unity_size * sizeof(Root), cudaMemcpyHostToDevice));
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -134,7 +126,8 @@ int main(int argc, char* argv[])
         .ntt_type = FORWARD,
         .reduction_poly = ReductionPolynomial::X_N_minus,
         .zero_padding = false,
-        .stream = 0};
+        .stream = 0
+    };
     GPU_NTT(InOut_Datas, Forward_Omega_Table_Device, parameters.modulus,
             cfg_ntt, BATCH);
 
@@ -144,7 +137,8 @@ int main(int argc, char* argv[])
         .reduction_poly = ReductionPolynomial::X_N_minus,
         .zero_padding = false,
         .mod_inverse = parameters.n_inv,
-        .stream = 0};
+        .stream = 0
+    };
     GPU_NTT(InOut_Datas, Inverse_Omega_Table_Device, parameters.modulus,
             cfg_intt, BATCH);
 
@@ -160,22 +154,19 @@ int main(int argc, char* argv[])
 
     // Comparing GPU NTT results and CPU NTT results
     bool check = true;
-    for (int i = 0; i < BATCH; i++)
-    {
+    for (int i = 0; i < BATCH; i++) {
         check = check_result(Output_Host + (i * parameters.n), input1[i].data(),
                              parameters.n);
 
         //check = check_result(Output_Host + (i * parameters.n), ntt_result[i].data(),
         //                     parameters.n);
-        
-        if (!check)
-        {
+
+        if (!check) {
             cout << "(in " << i << ". Poly.)" << endl;
             break;
         }
 
-        if ((i == (BATCH - 1)) && check)
-        {
+        if ((i == (BATCH - 1)) && check) {
             cout << "All Correct." << endl;
         }
     }

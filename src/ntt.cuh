@@ -30,14 +30,12 @@ typedef unsigned location_t;
 typedef unsigned long long location_t;
 #endif
 */
-enum type
-{
+enum type {
     FORWARD,
     INVERSE
 };
 
-struct ntt_configuration
-{
+struct ntt_configuration {
     int n_power;
     type ntt_type;
     ReductionPolynomial reduction_poly;
@@ -58,10 +56,10 @@ __global__ void ForwardCore(Data* polynomial, Root* root_of_unity_table,
                             bool reduction_poly_check);
 
 __global__ void ForwardCore_(Data* polynomial, Root* root_of_unity_table,
-                            Modulus modulus, int shared_index, int logm,
-                            int outer_iteration_count, int N_power,
-                            bool zero_padding, bool not_last_kernel,
-                            bool reduction_poly_check);
+                             Modulus modulus, int shared_index, int logm,
+                             int outer_iteration_count, int N_power,
+                             bool zero_padding, bool not_last_kernel,
+                             bool reduction_poly_check);
 
 __global__ void InverseCore(Data* polynomial, Root* inverse_root_of_unity_table,
                             Modulus modulus, int shared_index, int logm, int k,
@@ -70,10 +68,10 @@ __global__ void InverseCore(Data* polynomial, Root* inverse_root_of_unity_table,
                             bool reduction_poly_check);
 
 __global__ void InverseCore_(Data* polynomial, Root* inverse_root_of_unity_table,
-                            Modulus modulus, int shared_index, int logm, int k,
-                            int outer_iteration_count, int N_power,
-                            Ninverse n_inverse, bool last_kernel,
-                            bool reduction_poly_check);
+                             Modulus modulus, int shared_index, int logm, int k,
+                             int outer_iteration_count, int N_power,
+                             Ninverse n_inverse, bool last_kernel,
+                             bool reduction_poly_check);
 
 __host__ void GPU_NTT(Data* device_inout, Root* root_of_unity_table,
                       Modulus modulus, ntt_configuration cfg, int batch_size);

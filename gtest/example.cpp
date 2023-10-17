@@ -1,7 +1,7 @@
 #include <vector>
 #include <gtest/gtest.h>
 
-/** 
+/**
 $ sudo apt-get install libgtest-dev
 $ g++ test.cpp -lgtest
 */
