@@ -161,17 +161,17 @@ TEST(GpuModularBarret, multiplemodMultTest) {
 
     // Populate the vector with tuples of int and uint64_t values
     //tupleVector.push_back(std::make_tuple(10, 769ULL));
-    //tupleVector.push_back(std::make_tuple(12, 3073ULL));
-    // tupleVector.push_back(std::make_tuple(14, 12289ULL));
-    // tupleVector.push_back(std::make_tuple(16, 49153ULL));
-    // tupleVector.push_back(std::make_tuple(18, 196609ULL));
-    // tupleVector.push_back(std::make_tuple(20, 786433ULL));
-    // tupleVector.push_back(std::make_tuple(22, 3145729ULL));
-    // tupleVector.push_back(std::make_tuple(24, 12582913ULL));
-    // tupleVector.push_back(std::make_tuple(26, 50331649ULL));
-    // tupleVector.push_back(std::make_tuple(28, 201326593ULL));
+    tupleVector.push_back(std::make_tuple(12, 3073ULL));
+    tupleVector.push_back(std::make_tuple(14, 12289ULL));
+    tupleVector.push_back(std::make_tuple(16, 49153ULL));
+    tupleVector.push_back(std::make_tuple(18, 196609ULL));
+    tupleVector.push_back(std::make_tuple(20, 786433ULL));
+    tupleVector.push_back(std::make_tuple(22, 3145729ULL));
+    tupleVector.push_back(std::make_tuple(24, 12582913ULL));
+    tupleVector.push_back(std::make_tuple(26, 50331649ULL));
+    tupleVector.push_back(std::make_tuple(28, 201326593ULL));
     tupleVector.push_back(std::make_tuple(30, 805306369ULL));
-    tupleVector.push_back(std::make_tuple(32, 3221225473ULL));
+    tupleVector.push_back(std::make_tuple(32, 3221225473ULL)); //fails here
     tupleVector.push_back(std::make_tuple(34, 12884901889ULL));
     tupleVector.push_back(std::make_tuple(36, 51539607553ULL));
     tupleVector.push_back(std::make_tuple(38, 206158430209ULL));
@@ -193,7 +193,7 @@ TEST(GpuModularBarret, multiplemodMultTest) {
         Data a = (1 << bits) - 1 , b = (1 << (bits-2)) - 1;
         Modulus q(1 << bits);
         BarrettOperations bred;
-        ASSERT_EQ( bred.mult(a, b, q) , expected-1);
+        ASSERT_EQ( bred.mult(a, b, q) , expected);
 
     }
     
