@@ -1,7 +1,8 @@
 #include <cstdlib>  // For atoi or atof functions
 #include <random>
 
-#include "../src/ntt.cuh"
+//#include "../src/ntt.cuh"
+#include "ntt.cuh"
 
 #define DEFAULT_MODULUS
 

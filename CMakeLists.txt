@@ -20,6 +20,8 @@ set(TEST_SOURCES
     gtest/testsuite.cu
 )
 
+# includes
+include_directories("${CMAKE_CURRENT_LIST_DIR}/include")
 
 # alioNTT
 add_library(alioNTT src/common.cu src/nttparameters.cu src/ntt_cpu.cu src/ntt.cu)

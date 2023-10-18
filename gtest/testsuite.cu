@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "../src/ntt.cuh"
+#include "ntt.cuh"
 
 
 TEST(DeviceTests, MaxGridSizeProp0is2147483647) {
@@ -23,24 +23,25 @@ TEST(GpuModularBarret, modOneIsZero) {
     
     Data a = 0, b = 0;
     Modulus c(1);
-    BarrettOperations barro;
+    BarrettOperations bred;
     
-    ASSERT_EQ( barro.add(a, b, c) ,0);
+    ASSERT_EQ( bred.add(a, b, c) ,0);
     
 }
 
 TEST(GpuModularBarret, modFactorIsZero) {
     /**
-     >>> ((1<<16) + (1<<16)) % (1<<16)
-     0
+     * input should be 0...q-1
+     >>> ((1<<16)+(1<<16)-2) % (1<<16)
+    65534
     */
     using namespace barrett64_gpu;
     
-    Data a = 1 << 16, b = 1 << 16;
-    Modulus c(1 << 16);
-    BarrettOperations barro;
-    std::cout <<"barro.add(a, b, c) " << barro.add(a, b, c) << std::endl;
-    ASSERT_EQ( barro.add(a, b, c) ,0);
+    Data a = (1 << 16) - 1 , b = (1 << 16) - 1;
+    Modulus q(1 << 16);
+    BarrettOperations bred;
+    std::cout <<"bred.add(a, b, q) " << bred.add(a, b, q) << std::endl;
+    ASSERT_EQ( bred.add(a, b, q) , 65534);
     
 }
 
