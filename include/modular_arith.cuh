@@ -698,7 +698,7 @@ class PlantardOperations {
   public:
     // Modular Addition for 64 bit
     // result = (input1 + input2) % modulus
-    static __device__ Data add(Data& input1, Data& input2, Modulus& modulus) {
+    static __host__ __device__ Data add(Data& input1, Data& input2, Modulus& modulus) {
         Data sum = input1 + input2;
         sum = (sum >= modulus.value) ? (sum - modulus.value) : sum;
 
