@@ -348,7 +348,7 @@ class BarrettOperations {
 
     // Modular Substraction for 64 bit
     // result = (input1 - input2) % modulus
-    static __device__ Data sub(Data& input1, Data& input2, Modulus& modulus) {
+    static __host__ __device__ Data sub(Data& input1, Data& input2, Modulus& modulus) {
         Data dif = input1 + modulus.value;
         dif = dif - input2;
         dif = (dif >= modulus.value) ? (dif - modulus.value) : dif;
