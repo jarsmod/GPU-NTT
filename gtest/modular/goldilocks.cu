@@ -78,4 +78,53 @@ TEST(XpuModularGoldilocks, multiplemodAddTest) {
     
 }
 
+TEST(XpuModularGoldilocks, multiplemodSubTest) {
+    /**
+     * input should be 0...q-1
+     >>> for t in [ (x,((1<<x)-(1<<x-2)-2) % (1<<x)) for x in range(10,58,2)]:
+...     print("tupleVector.push_back(std::make_tuple({}, {}ULL));".format(t[0],t[1]))
+     */
+    using namespace goldilocks64_cpu; //TODO: change them to _gpu
+    std::vector<std::tuple<int, uint64_t>> tupleVector;
+
+    // Populate the vector with tuples of int and uint64_t values
+    tupleVector.push_back(std::make_tuple(10, 766ULL));
+    tupleVector.push_back(std::make_tuple(12, 3070ULL));
+    tupleVector.push_back(std::make_tuple(14, 12286ULL));
+    tupleVector.push_back(std::make_tuple(16, 49150ULL));
+    tupleVector.push_back(std::make_tuple(18, 196606ULL));
+    tupleVector.push_back(std::make_tuple(20, 786430ULL));
+    tupleVector.push_back(std::make_tuple(22, 3145726ULL));
+    tupleVector.push_back(std::make_tuple(24, 12582910ULL));
+    tupleVector.push_back(std::make_tuple(26, 50331646ULL));
+    tupleVector.push_back(std::make_tuple(28, 201326590ULL));
+    tupleVector.push_back(std::make_tuple(30, 805306366ULL));
+    tupleVector.push_back(std::make_tuple(32, 3221225470ULL)); //fails here
+    tupleVector.push_back(std::make_tuple(34, 12884901886ULL));
+    tupleVector.push_back(std::make_tuple(36, 51539607550ULL));
+    tupleVector.push_back(std::make_tuple(38, 206158430206ULL));
+    tupleVector.push_back(std::make_tuple(40, 824633720830ULL));
+    tupleVector.push_back(std::make_tuple(42, 3298534883326ULL));
+    tupleVector.push_back(std::make_tuple(44, 13194139533310ULL));
+    tupleVector.push_back(std::make_tuple(46, 52776558133246ULL));
+    tupleVector.push_back(std::make_tuple(48, 211106232532990ULL));
+    tupleVector.push_back(std::make_tuple(50, 844424930131966ULL));
+    tupleVector.push_back(std::make_tuple(52, 3377699720527870ULL));
+    tupleVector.push_back(std::make_tuple(54, 13510798882111486ULL));
+    tupleVector.push_back(std::make_tuple(56, 54043195528445950ULL));
+
+    for (size_t i = 0; i < tupleVector.size(); ++i) {
+        int bits;
+        uint64_t expected;
+        std::tie(bits, expected) = tupleVector[i];
+        
+        Data a = (1 << bits) - 2 , b = (1 << (bits-2)) - 0;
+        Modulus q(1 << bits);
+        GoldilocksOperations gred;
+        ASSERT_EQ( gred.sub(a, b, q) , expected);
+
+    }
+    
+}
+
 #endif

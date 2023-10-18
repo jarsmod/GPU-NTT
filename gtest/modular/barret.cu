@@ -104,7 +104,7 @@ TEST(GpuModularBarret, multiplemodSubTest) {
     tupleVector.push_back(std::make_tuple(26, 50331646ULL));
     tupleVector.push_back(std::make_tuple(28, 201326590ULL));
     tupleVector.push_back(std::make_tuple(30, 805306366ULL));
-    tupleVector.push_back(std::make_tuple(32, 3221225470ULL));
+    tupleVector.push_back(std::make_tuple(32, 3221225470ULL)); //fails here
     tupleVector.push_back(std::make_tuple(34, 12884901886ULL));
     tupleVector.push_back(std::make_tuple(36, 51539607550ULL));
     tupleVector.push_back(std::make_tuple(38, 206158430206ULL));
@@ -123,7 +123,7 @@ TEST(GpuModularBarret, multiplemodSubTest) {
         uint64_t expected;
         std::tie(bits, expected) = tupleVector[i];
         
-        Data a = (1 << bits) - 1 , b = (1 << (bits-2)) - 1;
+        Data a = (1 << bits) - 2 , b = (1 << (bits-2)) - 0;
         Modulus q(1 << bits);
         BarrettOperations bred;
         ASSERT_EQ( bred.sub(a, b, q) , expected);
