@@ -6,6 +6,7 @@
 #include "modular/barret.cu"
 #include "modular/goldilocks.cu"
 #include "modular/plantard.cu"
+#include "nttparams/bitreverse.cu"
 
 int main(int argc, char** argv) {
     ::testing::InitGoogleTest(&argc, argv);

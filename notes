@@ -89,3 +89,5 @@ NTTParameters parameters
 
 cmake . -D CMAKE_CUDA_ARCHITECTURES=86 -D MODULAR_REDUCTION_TYPE=0 -B./bbuild && ( cd bbuild && make; ) && ./bbuild/testsuite
 cmake . -D CMAKE_CUDA_ARCHITECTURES=86 -D MODULAR_REDUCTION_TYPE=0 -B./bbuild && ( cd bbuild && make; ) && ./bbuild/testsuite && ./bbuild/test_ntt_gpu
+./bbuild/test_ntt_cpu  12 1 2>&1 | tee logs/alis-bitreverse-test-ntt-cpu-12-1.log
+cat logs/alis-bitreverse-test-ntt-cpu-12-1.log | tail -n +2 | head -n -1 | sed 's/:/\ /g' | sort -g -k 1 | less

@@ -5,6 +5,9 @@
 #include "nttparameters.cuh"
 
 int bitreverse(int index, int n_power) {
+    if (index < 0 || n_power <= 0) { //704::added safety check
+        throw std::invalid_argument("Both index and n_power must be non-negative.");
+    }
     int res_1 = 0;
     for (int i = 0; i < n_power; i++) {
         res_1 <<= 1;
