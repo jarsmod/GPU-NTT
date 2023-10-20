@@ -36,3 +36,4 @@ alisahGPU-NTT.code-workspace
 docs/*
 *.orig
 .ackrc
+.vscode/*
