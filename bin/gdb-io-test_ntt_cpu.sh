@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+ex=(
+	-ex "set logging file logs/gdb-1.txt" 
+	-ex "set logging on"
+	-ex "set trace-commands on"
+	-ex "show logging" 
+	-ex "set print elements 200000"
+	-ex "break main"
+	-ex "break ntt_cpu_test.cu:78"
+	-ex "break ntt_cpu_test.cu:86"
+	-ex "continue" 
+	-ex "run 12 1"
+	-ex "continue" 
+	-ex "continue" 
+	-ex "print BATCH"
+	-ex "print parameters" 
+	-ex "print parameters.modulus"
+	-ex "print input1"
+	-ex "print input2"
+	-ex "print ntt_mult_result" 
+	-ex "print schoolbook_result" 
+	-ex "print BATCH"
+	-ex "continue" 
+	-ex "quit"
+)
+gdb -batch-silent "${ex[@]}" bbuild/test_ntt_cpu
