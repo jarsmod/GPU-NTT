@@ -3,6 +3,7 @@
 
 //#include "../src/ntt.cuh"
 #include "ntt.cuh"
+#include "helperutils.h"
 
 #define DEFAULT_MODULUS
 
@@ -74,6 +75,7 @@ int main(int argc, char* argv[]) {
 
     // Comparing CPU NTT multiplication results and schoolbook multiplication
     // results
+    std::cout << ">> poly schoolbook\n";
     bool check = true;
     for (int i = 0; i < BATCH; i++) {
         std::vector<Data> schoolbook_result = schoolbook_poly_multiplication(
@@ -82,6 +84,10 @@ int main(int argc, char* argv[]) {
 
         check = check_result(ntt_mult_result[i].data(),
                              schoolbook_result.data(), parameters.n);
+        writeVectorToFile<Data>(input1[i], "logs/input1.vec.log");
+        writeVectorToFile<Data>(input2[i], "logs/input2.vec.log");
+        writeVectorToFile<Data>(schoolbook_result, "logs/schoolbook_result.vec.log");
+        writeVectorToFile<Data>(ntt_mult_result[i], "logs/ntt_mult_result.vec.log");
         if (!check) {
             cout << "(in " << i << ". Poly.)" << endl;
             break;
@@ -90,6 +96,7 @@ int main(int argc, char* argv[]) {
         if ((i == (BATCH - 1)) && check) {
             cout << "All Correct." << endl;
         }
+
     }
 
     return EXIT_SUCCESS;

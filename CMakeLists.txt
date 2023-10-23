@@ -24,7 +24,7 @@ set(TEST_SOURCES
 include_directories("${CMAKE_CURRENT_LIST_DIR}/include")
 
 # alioNTT
-add_library(alioNTT src/common.cu src/nttparameters.cu src/ntt_cpu.cu src/ntt.cu)
+add_library(alioNTT src/common.cu src/nttparameters.cu src/ntt_cpu.cu src/ntt.cu src/helperutils.cpp)
 
 if(NOT "${CMAKE_CUDA_BYTE_ORDER}" STREQUAL "LITTLE_ENDIAN")
     message(FATAL_ERROR "Target architecture must be little-endian")
