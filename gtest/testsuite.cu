@@ -1,12 +1,13 @@
 #include <gtest/gtest.h>
 #include "ntt.cuh"
-
+#include "helperutils.h"
 
 #include "misc/device.cu"
 #include "modular/barret.cu"
 #include "modular/goldilocks.cu"
 #include "modular/plantard.cu"
 #include "nttparams/bitreverse.cu"
+#include "poly/schoolbook.cpp"
 
 int main(int argc, char** argv) {
     ::testing::InitGoogleTest(&argc, argv);

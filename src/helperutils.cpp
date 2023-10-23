@@ -22,3 +22,16 @@ void writeVectorToFile(const std::vector<T>& data, const std::string& filename) 
 
 // Explicit instantiation for 'unsigned long long'
 template void writeVectorToFile<unsigned long long>(const std::vector<unsigned long long>& data, const std::string& filename);
+
+
+template <typename T>
+void printVector(const std::vector<T>& data) {
+
+    for (const T& value : data) {
+        std::cout << value << "\n";
+    }
+
+}
+
+// Explicit instantiation for 'unsigned long long'
+template void printVector<unsigned long long>(const std::vector<unsigned long long>& data);
