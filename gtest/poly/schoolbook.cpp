@@ -114,3 +114,93 @@ TEST(SchoolBookPolyXply, second) {
      ASSERT_EQ( std::equal(expected.begin(), expected.end(), schoolbook_result.begin()), true );
     
 }
+
+/**\
+ * aS = np.array([3137099, 2439066, 5338084], dtype=np.uint64)
+ * mdl = 576460752303415297
+ * >>> (aS * 3137099) % mdl
+ * array([ 9841390135801,  7651591509534, 16746097978316], dtype=uint64)
+*/
+
+TEST(SchoolBookPolyXply, smallervalues) {
+    
+    
+    NTTParameters parameters(12, ModularReductionType::BARRET, ReductionPolynomial::X_N_minus);
+    NTT_CPU generator(parameters);
+        
+    //printf("Parameters:\n\tmodulus:%llu, bit:%llu, mu:%llu\n", parameters.modulus.value, parameters.modulus.bit, parameters.modulus.mu);
+    
+    if(parameters.modulus.value != 576460752303415297){
+        throw std::invalid_argument("modulus is not 576460752303415297");
+    }
+
+    std::vector<Data> input1{
+        3137099ULL,
+        2439066ULL,
+        5338084ULL
+    };
+
+    std::vector<Data> input2{
+        3137099ULL,
+        0ULL,
+        0ULL
+    };
+
+     std::vector<Data> expected{
+        9841390135801ULL, 
+        7651591509534ULL, 
+        16746097978316ULL
+    };
+
+
+
+    std::vector<Data> schoolbook_result 
+        = schoolbook_poly_multiplication( input1, input2, parameters.modulus, ReductionPolynomial::X_N_minus);
+    
+     ASSERT_EQ( std::equal(expected.begin(), expected.end(), schoolbook_result.begin()), true );
+    
+}
+
+/*
+>>> aS = np.array([3137099, 2439066, 5338084], dtype=np.uint64)
+>>> mdl = 576460752303415297
+>>> px = np.polymul(aS, aS) % mdl
+>>> if px.size % 2 == 1:
+...     px = np.insert(px, px.size, 0)
+>>> m = px.size // 2
+>>> (px[:m] + px[m:]) % mdl # reduction by x-1
+array([35881268514889, 43798323810124, 39441238908988], dtype=uint64)
+*/
+
+TEST(SchoolBookPolyXply, third) {
+    
+    
+    NTTParameters parameters(12, ModularReductionType::BARRET, ReductionPolynomial::X_N_minus);
+    NTT_CPU generator(parameters);
+        
+    //printf("Parameters:\n\tmodulus:%llu, bit:%llu, mu:%llu\n", parameters.modulus.value, parameters.modulus.bit, parameters.modulus.mu);
+    
+    if(parameters.modulus.value != 576460752303415297){
+        throw std::invalid_argument("modulus is not 576460752303415297");
+    }
+
+    std::vector<Data> input1{
+        3137099ULL,
+        2439066ULL,
+        5338084ULL
+    };
+
+
+     std::vector<Data> expected{
+        35881268514889ULL, 
+        43798323810124ULL, 
+        39441238908988ULL
+    };
+
+
+
+    std::vector<Data> schoolbook_result 
+        = schoolbook_poly_multiplication( input1, input1, parameters.modulus, ReductionPolynomial::X_N_minus);
+     ASSERT_EQ( std::equal(expected.begin(), expected.end(), schoolbook_result.begin()), true );
+    
+}

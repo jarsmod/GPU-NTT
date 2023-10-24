@@ -3,12 +3,20 @@
 // --------------------- //
 
 #include "ntt_cpu.cuh"
+#include "helperutils.h"
 
 std::vector<Data> schoolbook_poly_multiplication(
     std::vector<Data> a, std::vector<Data> b, Modulus modulus,
     ReductionPolynomial reduction_poly) {
     int length = a.size();
     std::vector<Data> mult_vector(length * 2, 0);
+    
+    std::cout<<"\n\t+++In:schoolbook_poly_multiplication()\n";
+    std::cout<<"modulus: "<<modulus.value <<std::endl;
+    std::cout<<"a\n";
+    printVector(a);
+    std::cout<<"\nb\n";
+    printVector(b);
 
     for (int i = 0; i < length; i++) {
         for (int j = 0; j < length; j++) {
@@ -17,6 +25,8 @@ std::vector<Data> schoolbook_poly_multiplication(
                 VALUE::add(mult_vector[i + j], mult_result, modulus);
         }
     }
+    std::cout <<"\nmult\n";
+    printVector(mult_vector);
 
     std::vector<Data> result(length, 0);
     if (reduction_poly == ReductionPolynomial::X_N_minus) {
