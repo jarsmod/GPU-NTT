@@ -204,3 +204,124 @@ TEST(SchoolBookPolyXply, third) {
      ASSERT_EQ( std::equal(expected.begin(), expected.end(), schoolbook_result.begin()), true );
     
 }
+
+TEST(SchoolBookPolyXply, fourth) {
+    
+    
+    NTTParameters parameters(12, ModularReductionType::BARRET, ReductionPolynomial::X_N_minus);
+    NTT_CPU generator(parameters);
+        
+    //printf("Parameters:\n\tmodulus:%llu, bit:%llu, mu:%llu\n", parameters.modulus.value, parameters.modulus.bit, parameters.modulus.mu);
+    
+    if(parameters.modulus.value != 576460752303415297){
+        throw std::invalid_argument("modulus is not 576460752303415297");
+    }
+
+    std::vector<Data> input1{
+        3137099ULL,
+        2439066ULL,
+        5338084ULL
+    };
+
+    std::vector<Data> input2{
+        5338084ULL,
+        2439066ULL,
+        3137099ULL,
+    };
+
+     std::vector<Data> expected{
+        37417628677394ULL, 
+        37417628677394ULL, 
+        44285573879213ULL,
+    };
+
+
+
+    std::vector<Data> schoolbook_result 
+        = schoolbook_poly_multiplication( input1, input2, parameters.modulus, ReductionPolynomial::X_N_minus);
+     ASSERT_EQ( std::equal(expected.begin(), expected.end(), schoolbook_result.begin()), true );
+    
+}
+
+TEST(SchoolBookPolyXply, fifth) {
+    
+    
+    NTTParameters parameters(12, ModularReductionType::BARRET, ReductionPolynomial::X_N_minus);
+    NTT_CPU generator(parameters);
+        
+    //printf("Parameters:\n\tmodulus:%llu, bit:%llu, mu:%llu\n", parameters.modulus.value, parameters.modulus.bit, parameters.modulus.mu);
+    
+    if(parameters.modulus.value != 576460752303415297){
+        throw std::invalid_argument("modulus is not 576460752303415297");
+    }
+
+    std::vector<Data> input1{
+        3137099, 2439066, 5338084, 2439066,
+    };
+
+    std::vector<Data> input2{
+        5338084, 2439066, 3137099, 2439066,
+    };
+
+     std::vector<Data> expected{
+        45390281861344, 41343061398156, 50234616831569, 41343061398156,
+    };
+
+
+
+    std::vector<Data> schoolbook_result 
+        = schoolbook_poly_multiplication( input1, input2, parameters.modulus, ReductionPolynomial::X_N_minus);
+     ASSERT_EQ( std::equal(expected.begin(), expected.end(), schoolbook_result.begin()), true );
+    
+}
+
+/**
+a = [31370993137099, 24390662439066, 53380845338084, 24390662439066]
+b = [53380845338084, 24390662439066, 31370993137099, 24390662439066]
+
+aS = np.array(a, dtype=np.uint64)
+bS = np.array(b, dtype=np.uint64)
+
+mdl = 576460752303415297
+
+print(aS, bS, mdl)
+
+px = np.polymul(aS, bS) % mdl
+
+if px.size % 2 == 1:
+    px = np.insert(px, px.size, 0)
+
+m = px.size // 2
+ans = (px[:m] + px[m:]) % mdl # reduction by x-1
+print (ans)
+
+*/
+TEST(SchoolBookPolyXply, sixth) {
+    
+    
+    NTTParameters parameters(12, ModularReductionType::BARRET, ReductionPolynomial::X_N_minus);
+    NTT_CPU generator(parameters);
+        
+    //printf("Parameters:\n\tmodulus:%llu, bit:%llu, mu:%llu\n", parameters.modulus.value, parameters.modulus.bit, parameters.modulus.mu);
+    
+    if(parameters.modulus.value != 576460752303415297){
+        throw std::invalid_argument("modulus is not 576460752303415297");
+    }
+
+    std::vector<Data> input1{
+        31370993137099, 24390662439066, 53380845338084, 24390662439066,
+    };
+
+    std::vector<Data> input2{
+        53380845338084, 24390662439066, 31370993137099, 24390662439066,
+    };
+
+     std::vector<Data> expected{
+        230352206369958105, 570020705986252373, 176229344153516850, 570020705985990261,
+    };
+
+    std::vector<Data> schoolbook_result 
+        = schoolbook_poly_multiplication( input1, input2, parameters.modulus, ReductionPolynomial::X_N_minus);
+     ASSERT_EQ( std::equal(expected.begin(), expected.end(), schoolbook_result.begin()), true );
+    
+}
